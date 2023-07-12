@@ -191,5 +191,113 @@ public class BaseballDAO {
 		}
 		return null;
 	}
+	
+	public List<People> getPlayerPerAS(Integer anno, double salario){
+		String sql = "select distinct p.* "
+				+ "from `salaries` s, people p "
+				+ "where s.year=? and s.salary>? and s.playerid=p.playerid ";
+		List<People> result = new ArrayList<People>();
+
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setInt(1, anno);
+			st.setDouble(2, salario);
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+				result.add(new People(rs.getString("playerID"), 
+						rs.getString("birthCountry"), 
+						rs.getString("birthCity"), 
+						rs.getString("deathCountry"), 
+						rs.getString("deathCity"),
+						rs.getString("nameFirst"), 
+						rs.getString("nameLast"), 
+						rs.getInt("weight"), 
+						rs.getInt("height"), 
+						rs.getString("bats"), 
+						rs.getString("throws"),
+						getBirthDate(rs), 
+						getDebutDate(rs), 
+						getFinalGameDate(rs), 
+						getDeathDate(rs)) );
+			}
+
+			conn.close();
+			return result;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database");
+		}
+	}
+	
+	public List<Integer> getAnni(){
+		String sql = "select distinct year "
+				+ "from `teams` "
+				+ "order by year asc ";
+		List<Integer> result = new ArrayList<Integer>();
+
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+				result.add(rs.getInt("year"));
+			}
+
+			conn.close();
+			return result;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database");
+		}
+	}
+	
+	public List<People> trovaCompagni(Integer anno, String playerid){
+		String sql = "select distinct p2.* "
+				+ "     from appearances a1, appearances a2, people p1, people p2 "
+				+ "     where a1.playerid=p1.playerid and a2.playerid=p2.playerid and a1.teamcode=a2.teamcode and p1.playerid=? and a2.`year`=? and a1.`year`=? and p1.playerid!=p2.playerid ";
+		List<People> result = new ArrayList<People>();
+
+		try {
+			Connection conn = DBConnect.getConnection();
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setString(1, playerid);
+			st.setInt(2, anno);
+			st.setInt(3, anno);
+			ResultSet rs = st.executeQuery();
+
+			while (rs.next()) {
+				result.add(new People(rs.getString("playerID"), 
+						rs.getString("birthCountry"), 
+						rs.getString("birthCity"), 
+						rs.getString("deathCountry"), 
+						rs.getString("deathCity"),
+						rs.getString("nameFirst"), 
+						rs.getString("nameLast"), 
+						rs.getInt("weight"), 
+						rs.getInt("height"), 
+						rs.getString("bats"), 
+						rs.getString("throws"),
+						getBirthDate(rs), 
+						getDebutDate(rs), 
+						getFinalGameDate(rs), 
+						getDeathDate(rs)) );
+			}
+
+			conn.close();
+			return result;
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Errore connessione al database");
+			throw new RuntimeException("Error Connection Database");
+		}
+	}
 
 }

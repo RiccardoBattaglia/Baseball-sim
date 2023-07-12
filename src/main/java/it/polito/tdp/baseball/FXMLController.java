@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import org.jgrapht.alg.util.Pair;
+
 import it.polito.tdp.baseball.model.Model;
 import it.polito.tdp.baseball.model.People;
 import javafx.event.ActionEvent;
@@ -48,6 +50,8 @@ public class FXMLController {
     
     @FXML
     void doCalcolaConnesse(ActionEvent event) {
+    
+    	this.txtResult.appendText("Ci sono " + this.model.getComponente().size() + " componenti connesse.\n\n");
     	
     }
 
@@ -55,6 +59,63 @@ public class FXMLController {
     
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	
+
+   	 String a = txtYear.getText() ;
+    	
+    	if(a.equals("")) {
+    		txtResult.setText("Inserire un anno.\n");
+    		return ;
+    	}
+    	
+    	int anno = 0 ;
+
+    	try {
+	    	anno = Integer.parseInt(a) ;
+    	} catch(NumberFormatException e) {
+    		txtResult.setText("Inserire un numero come anno.\n");
+    		return ;
+    	}
+    	
+    	if(!this.model.getAnni().contains(anno)) {
+    		txtResult.setText("Inserire un anno valido.\n");
+    		return ;
+    	}
+    	
+       String s = txtSalary.getText() ;
+    	
+    	if(s.equals("")) {
+    		txtResult.setText("Inserire un salario.\n");
+    		return ;
+    	}
+    	
+    	double salario;
+    	
+    	try {
+	    	salario = Double.parseDouble(s) ;
+    	} catch(NumberFormatException e) {
+    		txtResult.setText("Inserire un numero come salario.\n");
+    		return ;
+    	}
+    	
+//   	creazione grafo
+   	this.model.creaGrafo(anno, salario*1000000);
+   	
+   	
+//   	stampa grafo
+   	this.txtResult.setText("Grafo creato.\n");
+   	this.txtResult.appendText("Ci sono " + this.model.nVertici() + " vertici\n");
+   	this.txtResult.appendText("Ci sono " + this.model.nArchi() + " archi\n\n");
+   	
+   	btnConnesse.setDisable(false);
+   	btnGradoMassimo.setDisable(false);
+   	
+//   	Set<User> vertici = this.model.getVertici();
+//   	
+//   	for(User i : vertici) {
+//   		cmbUtente.getItems().add(new Pair<String, String>(i.getName(), i.getUserId()));
+//   	}
+//   	
     	
     }
 
@@ -67,7 +128,21 @@ public class FXMLController {
     
     @FXML
     void doGradoMassimo(ActionEvent event) {
+    	
+    	int max=0;
 
+    	for(People p : this.model.getVertici()) {
+    		if(max<this.model.nArchiPerVertice(p)) {
+    			max=this.model.nArchiPerVertice(p);
+    		}
+    	}
+    	
+    	for(People p : this.model.getVertici()) {
+    		if(max==this.model.nArchiPerVertice(p)) {
+    			this.txtResult.appendText("Nodo di grado massimo:\nGrado:" + max + " <-> Vertice: " + p + " \n\n");
+    		}
+    	}
+    	
     }
 
     
